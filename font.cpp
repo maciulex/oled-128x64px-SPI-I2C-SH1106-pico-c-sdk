@@ -2,6 +2,7 @@
 #define FONT_F
 
 #include <cstdio>
+#include <string>
 #include "pico/stdlib.h"
 
 namespace FONT {
@@ -29,12 +30,12 @@ namespace FONT {
     };
 
     uint8_t n1[6] {
-        {0b0110'0000},
-        {0b1110'0000},
-        {0b0010'0000},
-        {0b0010'0000},
-        {0b0010'0000},
-        {0b0010'0000}
+        0b0110'0000,
+        0b1110'0000,
+        0b0010'0000,
+        0b0010'0000,
+        0b0010'0000,
+        0b0010'0000
     };
 
     uint8_t n2[6] {
@@ -253,6 +254,15 @@ namespace FONT {
         0b1000'0000
     };
 
+    uint8_t Q[6] {
+        0b1111'0000,
+        0b1001'0000,
+        0b1001'0000,
+        0b1111'0000,
+        0b0010'0000,
+        0b0001'0000
+    };
+
     uint8_t R[6] {
         0b1110'0000,
         0b1001'0000,
@@ -289,6 +299,24 @@ namespace FONT {
         0b1111'0000
     };
 
+    uint8_t V[6] {
+        0b1001'0000,
+        0b1001'0000,
+        0b1001'0000,
+        0b1001'0000,
+        0b1111'0000,
+        0b0110'0000
+    };
+
+    uint8_t W[6] {
+        0b1001'0000,
+        0b1001'0000,
+        0b1001'0000,
+        0b1001'0000,
+        0b1111'0000,
+        0b1001'0000
+    };
+
     uint8_t X[6] {
         0b1001'0000,
         0b1001'0000,
@@ -316,7 +344,7 @@ namespace FONT {
         0b1111'0000
     };
 
-    uint8_t *charMap[88] {
+    uint8_t *charMap[] {
         &SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],
         &SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],
         &SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],&SPACE[0],
@@ -325,24 +353,32 @@ namespace FONT {
         &n0[0], &n1[0], &n2[0], &n3[0], &n4[0], &n5[0], &n6[0], &n7[0], &n8[0], &n9[0],
         &SPACE[0],&SPACE[0], &SPACE[0],&SPACE[0], &SPACE[0],&SPACE[0], &SPACE[0],
         &A[0], &B[0], &C[0], &D[0], &E[0], &F[0], &G[0], &H[0], &I[0], &J[0], &K[0],
-        &L[0], &M[0], &N[0], &O[0], &P[0], &R[0], &S[0], &T[0], &U[0], &X[0], &Y[0], &Z[0]
+        &L[0], &M[0], &N[0], &O[0], &P[0], &Q[0], &R[0], &S[0], &T[0], &U[0], &V[0], &W[0], &X[0], &Y[0], &Z[0]
     };
 
-    void putChar(uint8_t CHAR, uint8_t sx, uint8_t sy, bool *board, uint8_t scaling = 1) {
+    uint8_t putChar(uint8_t CHAR, uint8_t sx, uint8_t sy, bool *board, uint8_t scaling = 1) {
+        if (CHAR > 90) {
+            CHAR -= 32;
+        }
         uint8_t *charPointer = charMap[CHAR];
-        for (int y = 0; y < 6; y++) {
-            uint8_t *charLinePointer = &charPointer[y];
-            for (int x = 0; x < 4; x++) {
-                board[(x+sx)*border_y+(y+sy)] = (*charLinePointer >> (x+4)) & 0b0000'0001;
+        for (int y = 0; y < 6*scaling; y++) {
+            uint8_t *charLinePointer = &charPointer[y/scaling];
+            for (int x = 0; x < 4*scaling; x++) {
+                if (x+sx > border_x || y+sy > border_y) continue;
+                board[(x+sx)*border_y+(y+sy)] = ((*charLinePointer << (x/scaling)) & 0b1000'0000) >> 7;
             }
         }
+        return sx+4*scaling;
     }
 
+    uint8_t putString(std::string string, uint8_t sx, uint8_t sy, bool *board, uint8_t scaling = 1) {
+        uint8_t indexOfLast = sx;
+        for (int i = 0; i < string.length(); i++) {
+            indexOfLast = putChar(string[i], indexOfLast, sy, board, scaling) + 1;
+        }
+        return indexOfLast;
+    }
 
-
-
-    
 }
-
 
 #endif

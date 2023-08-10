@@ -225,10 +225,15 @@ namespace SH1106
         turnDisplay(true);
         sleep_ms(100);
         cleanRam();
-        for (int x = 40; x < 50; x++) {
-            for (int y = 40; y < 50; y++) frame[x][y] = true;
+        for (int x = 20; x < 30; x++) {
+            for (int y = 30; y < 40; y++) frame[x][y] = true;
         }
-        FONT::putChar('A', 10, 10, (bool *)frame);
+        uint8_t endOFLast = FONT::putChar('A', 10, 10, (bool *)frame,1);
+        endOFLast = FONT::putChar('A', endOFLast+1, 10, (bool *)frame,2);
+        endOFLast = FONT::putChar('A', endOFLast+1, 10, (bool *)frame,3);
+        endOFLast = FONT::putChar('A', endOFLast+1, 10, (bool *)frame,4);
+        endOFLast = FONT::putChar('A', endOFLast+1, 10, (bool *)frame,5);
+        FONT::putString("HELLO WORLD", 10, 49, (bool *)frame, 2);
         displayFrame();
 
         return;
