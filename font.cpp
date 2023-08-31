@@ -364,7 +364,7 @@ namespace FONT {
         for (int y = 0; y < 6*scaling; y++) {
             uint8_t *charLinePointer = &charPointer[y/scaling];
             for (int x = 0; x < 4*scaling; x++) {
-                if (x+sx > border_x || y+sy > border_y) continue;
+                if (x+sx > border_x || y+sy > border_y || x+sx < 0 || y+sy < 0) continue;
                 board[(x+sx)*border_y+(y+sy)] = ((*charLinePointer << (x/scaling)) & 0b1000'0000) >> 7;
             }
         }

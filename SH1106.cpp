@@ -1,6 +1,7 @@
 #ifndef SH1106_F
 #define SH1106_F
 
+#include <string>
 #include <cstdio>
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
@@ -195,7 +196,7 @@ namespace SH1106
     }
 
     void displayFrame() {
-        for (int y = 0; y < 9; y++) {
+        for (int y = 0; y < 8; y++) {
             uint8_t line[128]; 
             setColumn(0);
             setPageAdress(y);
@@ -210,64 +211,8 @@ namespace SH1106
                             | (frame[x][(y*8)+7] << 7));
             }
             dataSend(line, 128);
+        printf("frame display end\n");
         }
-    }
-
-    void testz() {
-        turnDisplay(false);
-
-        setContrast(125);
-        setPageAdress(0);
-        setColumn(0);
-        setLine(0);
-        entireDisplaySwitch(false);
-
-        turnDisplay(true);
-        sleep_ms(100);
-        cleanRam();
-        for (int x = 20; x < 30; x++) {
-            for (int y = 30; y < 40; y++) frame[x][y] = true;
-        }
-        uint8_t endOFLast = FONT::putChar('A', 10, 10, (bool *)frame,1);
-        endOFLast = FONT::putChar('A', endOFLast+1, 10, (bool *)frame,2);
-        endOFLast = FONT::putChar('A', endOFLast+1, 10, (bool *)frame,3);
-        endOFLast = FONT::putChar('A', endOFLast+1, 10, (bool *)frame,4);
-        endOFLast = FONT::putChar('A', endOFLast+1, 10, (bool *)frame,5);
-        FONT::putString("HELLO WORLD", 10, 49, (bool *)frame, 2);
-        displayFrame();
-
-        return;
-        uint8_t data[8] {0b0111'0000,
-                         0b1000'1000,
-                         0b1000'0000,
-                         0b1111'0000,
-                         0b0000'1000,
-                         0b1000'1000,
-                         0b1000'1000,
-                         0b0111'0000};
-
-        setPageAdress(0);
-        setColumn(2);
-        dataSend(data, 8);
-        setColumn(122);
-
-        dataSend(data, 8);
-        setColumn(139);
-        dataSend(data, 8);
-
-        setPageAdress(1);
-        setColumn(2);
-        dataSend(data, 8);
-        return;
-        setPageAdress(4);
-        setLine(0);
-        data[0] = 0b1000'0001;
-        dataSend(data, 1);
-
-        while (1) {
-
-        }
-
     }
 
     void init(bool initSpi) {
@@ -283,9 +228,17 @@ namespace SH1106
         gpio_set_dir(RES_PIN, GPIO_OUT);
         gpio_put(RES_PIN, 1);
         resetz();
+        turnDisplay(false);
 
-        testz();
+        setContrast(125);
+        setPageAdress(0);
+        setColumn(0);
+        setLine(0);
+        entireDisplaySwitch(false);
 
+        turnDisplay(true);
+        sleep_ms(100);
+        cleanRam();
     }
 
 } // namespace SH1106
